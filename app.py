@@ -5,24 +5,15 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
-import sys
 
-# Читання credentials із змінної середовища
-credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+# Читання credentials із Secret File
+with open('/etc/secrets/credentials.json', 'r') as f:
+    credentials_info = json.load(f)
 
-if not credentials_json:
-    print("❌ Environment variable GOOGLE_CREDENTIALS is missing!", file=sys.stderr)
-    exit(1)
-
-try:
-    credentials_info = json.loads(credentials_json)
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive"
-    ])
-except Exception as e:
-    print(f"❌ Error parsing GOOGLE_CREDENTIALS: {e}", file=sys.stderr)
-    exit(1)
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+])
 
 # Підключення до Google Sheets
 client = gspread.authorize(credentials)
@@ -51,7 +42,7 @@ def load_all_recipes():
 # Ендпоінт для отримання рецептів
 @app.get("/recipes")
 async def get_recipes(request: Request):
-    all_recipes = load_all_records()
+    all_recipes = load_all_recipes()
     category = request.query_params.get('category')
 
     if category:
