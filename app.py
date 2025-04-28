@@ -1,6 +1,3 @@
-import os
-import json
-from io import StringIO
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -9,7 +6,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
 import sys
-from oauth2client.service_account import ServiceAccountCredentials
 
 # Читання credentials із змінної середовища
 credentials_json = os.getenv('GOOGLE_CREDENTIALS')
@@ -28,16 +24,17 @@ except Exception as e:
     print(f"❌ Error parsing GOOGLE_CREDENTIALS: {e}", file=sys.stderr)
     exit(1)
 
+# Підключення до Google Sheets
 client = gspread.authorize(credentials)
 
 # Відкриття таблиці
 spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr_uNCL0_F7Qcrgwg_K0YCSEy9ISoWX_ZUDuSYg/edit')
 worksheet = spreadsheet.sheet1
 
-# Додаток FastAPI
+# Створення додатку FastAPI
 app = FastAPI()
 
-# CORS
+# Додаємо CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -51,10 +48,10 @@ def load_all_recipes():
     data = worksheet.get_all_records()
     return data
 
-# Ендпоінт
+# Ендпоінт для отримання рецептів
 @app.get("/recipes")
 async def get_recipes(request: Request):
-    all_recipes = load_all_recipes()
+    all_recipes = load_all_records()
     category = request.query_params.get('category')
 
     if category:
@@ -66,6 +63,6 @@ async def get_recipes(request: Request):
 
     return all_recipes
 
-# Локальний запуск
+# Запуск сервера
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
