@@ -6,13 +6,27 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import os
+import json
+import sys
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Читання credentials із змінної середовища
-credentials_info = json.loads(os.getenv('GOOGLE_CREDENTIALS'))
-credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive"
-])
+credentials_json = os.getenv('GOOGLE_CREDENTIALS')
+
+if not credentials_json:
+    print("❌ Environment variable GOOGLE_CREDENTIALS is missing!", file=sys.stderr)
+    exit(1)
+
+try:
+    credentials_info = json.loads(credentials_json)
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive"
+    ])
+except Exception as e:
+    print(f"❌ Error parsing GOOGLE_CREDENTIALS: {e}", file=sys.stderr)
+    exit(1)
 
 client = gspread.authorize(credentials)
 
