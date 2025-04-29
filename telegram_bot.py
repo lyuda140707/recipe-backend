@@ -1,9 +1,9 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from aiogram.utils import executor  # ✅ правильний імпорт для версії 2.25.1
+from aiogram.utils import executor
 import os
 
-API_TOKEN = os.getenv("BOT_TOKEN")  # має бути додано в Render → Environment
+API_TOKEN = os.getenv("BOT_TOKEN")  # або встав сюди токен напряму як рядок
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -16,4 +16,4 @@ async def send_welcome(message: types.Message):
     await message.answer("Привіт! 👋 Щоб почати — натисни кнопку нижче 👇", reply_markup=keyboard)
 
 def run_bot():
-    start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True)
