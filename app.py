@@ -53,6 +53,11 @@ async def get_recipes(request: Request):
         return filtered
 
     return all_recipes
+from telegram_bot import run_bot
+import threading
+
+# Запуск Telegram-бота у фоновому потоці
+threading.Thread(target=run_bot).start()
 
 # Запуск сервера
 if __name__ == "__main__":
