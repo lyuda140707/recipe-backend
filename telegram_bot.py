@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.utils import executor
 import os
 
-API_TOKEN = os.getenv("BOT_TOKEN")  # або встав сюди токен напряму як рядок
+API_TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -17,3 +17,6 @@ async def send_welcome(message: types.Message):
 
 def run_bot():
     executor.start_polling(dp, skip_updates=True)
+
+if __name__ == "__main__":
+    run_bot()
