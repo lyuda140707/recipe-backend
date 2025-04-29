@@ -43,7 +43,8 @@ async def get_recipes(request: Request):
     category = request.query_params.get("category")
 
     if category:
-        return [r for r in all_recipes if r.get("Категорія", "").strip().lower() == category.strip().lower()]
+       return [r for r in all_recipes if r.get("категорія", "").strip().lower() == category.strip().lower()]
+
     return all_recipes
 
 
