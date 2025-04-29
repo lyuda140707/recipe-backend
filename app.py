@@ -5,8 +5,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
-import threading
-from telegram_bot import run_bot  # імпортуємо запуск бота
+
+
 
 # Читання credentials із Secret File
 with open('/etc/secrets/credentials.json', 'r') as f:
@@ -46,8 +46,7 @@ async def get_recipes(request: Request):
         return [r for r in all_recipes if r.get("Категорія", "").strip().lower() == category.strip().lower()]
     return all_recipes
 
-# Запустити Telegram-бота у фоновому потоці
-threading.Thread(target=run_bot).start()
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
