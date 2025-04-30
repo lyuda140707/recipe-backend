@@ -6,6 +6,10 @@ import os
 API_TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=API_TOKEN)
+Bot.set_current(bot)  # ВАЖЛИВО!
+dp = Dispatcher(bot)
+
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
