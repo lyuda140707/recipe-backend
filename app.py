@@ -44,7 +44,7 @@ async def on_startup():
 async def webhook_handler(request: Request):
     data = await request.json()
     telegram_update = Update(**data)
-    print("🌀 Оновлення прийшло:", telegram_update)
+    print("✅ Я оновлений!")
     await dp.process_update(telegram_update)
     return {"ok": True}
     
