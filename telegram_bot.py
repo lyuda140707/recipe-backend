@@ -18,5 +18,4 @@ async def send_welcome(message: types.Message):
 def run_bot():
     executor.start_polling(dp, skip_updates=True)
 
-if __name__ == "__main__":
-    run_bot()
+
