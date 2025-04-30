@@ -15,7 +15,3 @@ async def send_welcome(message: types.Message):
     ])
     await message.answer("Привіт! 👋 Щоб почати — натисни кнопку нижче 👇", reply_markup=keyboard)
 
-def run_bot():
-    executor.start_polling(dp, skip_updates=True)
-
-
