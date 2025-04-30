@@ -43,6 +43,7 @@ async def on_startup():
 @app.post("/webhook")
 async def webhook_handler(update: dict):
     telegram_update = Update.model_validate(update)
+    print("🌀 Отримано оновлення:", telegram_update)
     await dp.feed_update(bot, telegram_update)
     return {"ok": True}
     
