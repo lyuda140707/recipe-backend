@@ -5,6 +5,9 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
+from telegram_bot import bot, dp
+from aiogram.types import Update
+import asyncio
 
 
 
@@ -32,7 +35,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.on_event("startup")
+async def on_startup():
+    await bot.set_webhook("https://recipe-backend-0gz1.onrender.com/webhook")
+    print("✅ Webhook встановлено")
 
+@app.post("/webhook")
+async def webhook_handler(update: dict):
+    telegram_update = Update.model_validate(update)
+    await dp.feed_update(bot, telegram_update)
+    return {"ok": True}
+    
 # Завантажити всі рецепти
 def load_all_recipes():
     return worksheet.get_all_records()
