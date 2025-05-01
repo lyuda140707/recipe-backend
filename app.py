@@ -66,6 +66,7 @@ import random
 
 @app.get("/weekly-menu")
 async def generate_weekly_menu():
+    return {"ok": True}
     categories = {
         "Пн": "🥘 Другі страви",
         "Вт": "🥪 Закуски",
