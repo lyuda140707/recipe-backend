@@ -61,52 +61,39 @@ async def get_recipes(request: Request):
        return [r for r in all_recipes if r.get("категорія", "").strip().lower() == category.strip().lower()]
 
     return all_recipes
+    
 from collections import defaultdict
 import random
 
 @app.get("/weekly-menu")
 async def generate_weekly_menu():
-    data = load_all_recipes()
-
-    category = "🍞 Випічка"
-    filtered = [row for row in data if row.get("категорія") == category]
-
-    # Групуємо по "номер рецепту"
-    grouped = defaultdict(list)
-    for row in filtered:
-        grouped[row["номер рецепту"]].append(row)
-
-    # Вибираємо випадкову групу
-    if grouped:
-        chosen_number = random.choice(list(grouped.keys()))
-        chosen_recipe = grouped[chosen_number]
-    else:
-        chosen_number = None
-        chosen_recipe = []
-
-    return {
-        "категорія": category,
-        "випадковий_номер": chosen_number,
-        "блоки": chosen_recipe
+    categories = {
+        "Пн": "🥘 Другі страви",
+        "Вт": "🥪 Закуски",
+        "Ср": "🍞 Випічка",
+        "Чт": "🍲 Перші страви",
+        "Пт": "🍰 Десерти",
+        "Сб": "🥤 Напої",
+        "Нд": "🥗 Салати"
     }
 
-
     data = load_all_recipes()
-    result = {}
+    weekly_menu = {}
 
     for day, category in categories.items():
         filtered = [row for row in data if row.get("категорія") == category]
+
         grouped = defaultdict(list)
         for row in filtered:
             grouped[row["номер рецепту"]].append(row)
 
         if grouped:
-            chosen = random.choice(list(grouped.values()))
-            result[day] = chosen
+            chosen_number = random.choice(list(grouped.keys()))
+            weekly_menu[day] = grouped[chosen_number]
         else:
-            result[day] = []
+            weekly_menu[day] = []
 
-    return result
+    return weekly_menu
 
 @app.get("/ping")
 async def ping():
