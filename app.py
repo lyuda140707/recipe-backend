@@ -71,10 +71,23 @@ async def generate_weekly_menu():
     category = "🍞 Випічка"
     filtered = [row for row in data if row.get("категорія") == category]
 
+    # Групуємо по "номер рецепту"
+    grouped = defaultdict(list)
+    for row in filtered:
+        grouped[row["номер рецепту"]].append(row)
+
+    # Вибираємо випадкову групу
+    if grouped:
+        chosen_number = random.choice(list(grouped.keys()))
+        chosen_recipe = grouped[chosen_number]
+    else:
+        chosen_number = None
+        chosen_recipe = []
+
     return {
         "категорія": category,
-        "знайдено": len(filtered),
-        "приклад": filtered[0] if filtered else "нема"
+        "випадковий_номер": chosen_number,
+        "блоки": chosen_recipe
     }
 
 
