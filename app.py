@@ -61,6 +61,37 @@ async def get_recipes(request: Request):
        return [r for r in all_recipes if r.get("категорія", "").strip().lower() == category.strip().lower()]
 
     return all_recipes
+from collections import defaultdict
+import random
+
+@app.get("/weekly-menu")
+async def generate_weekly_menu():
+    categories = {
+        "Пн": "🥘 Другі страви",
+        "Вт": "🥪 Закуски",
+        "Ср": "🍞 Випічка",
+        "Чт": "🍲 Перші страви",
+        "Пт": "🍰 Десерти",
+        "Сб": "🥤 Напої",
+        "Нд": "🥗 Салати"
+    }
+
+    data = load_all_recipes()
+    result = {}
+
+    for day, category in categories.items():
+        filtered = [row for row in data if row.get("категорія") == category]
+        grouped = defaultdict(list)
+        for row in filtered:
+            grouped[row["номер рецепту"]].append(row)
+
+        if grouped:
+            chosen = random.choice(list(grouped.values()))
+            result[day] = chosen
+        else:
+            result[day] = []
+
+    return result
 
 
 
