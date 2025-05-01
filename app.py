@@ -93,6 +93,9 @@ async def generate_weekly_menu():
 
     return result
 
+@app.get("/ping")
+async def ping():
+    return {"pong": True}
 
 
 if __name__ == "__main__":
