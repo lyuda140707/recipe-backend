@@ -52,12 +52,7 @@ async def webhook_handler(request: Request):
 def load_all_recipes():
     return worksheet.get_all_records()
 
-@app.get("/recipes")
-async def get_recipes(request: Request):
-    all_recipes = load_all_recipes()
-    category = request.query_params.get("category")
-
-    import re
+import re  # або перенеси нагору
 
 def clean_category(raw: str):
     # видаляє всі емодзі та приводить до нижнього регістру
@@ -77,7 +72,6 @@ async def get_recipes(request: Request):
 
     return all_recipes
 
-    return all_recipes
     
 from collections import defaultdict
 import random
