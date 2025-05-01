@@ -67,16 +67,16 @@ import random
 @app.get("/weekly-menu")
 async def generate_weekly_menu():
     data = load_all_recipes()
-    return {"кількість_рядків": len(data)}
-    categories = {
-        "Пн": "🥘 Другі страви",
-        "Вт": "🥪 Закуски",
-        "Ср": "🍞 Випічка",
-        "Чт": "🍲 Перші страви",
-        "Пт": "🍰 Десерти",
-        "Сб": "🥤 Напої",
-        "Нд": "🥗 Салати"
+
+    category = "🍞 Випічка"
+    filtered = [row for row in data if row.get("категорія") == category]
+
+    return {
+        "категорія": category,
+        "знайдено": len(filtered),
+        "приклад": filtered[0] if filtered else "нема"
     }
+
 
     data = load_all_recipes()
     result = {}
