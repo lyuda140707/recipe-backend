@@ -78,7 +78,7 @@ async def generate_weekly_menu():
     }
 
     data = load_all_recipes()
-    weekly_menu = {}
+    menu = {}
 
     for day, category in categories.items():
         filtered = [row for row in data if row.get("категорія") == category]
@@ -89,11 +89,12 @@ async def generate_weekly_menu():
 
         if grouped:
             chosen_number = random.choice(list(grouped.keys()))
-            weekly_menu[day] = grouped[chosen_number]
+            menu[day] = grouped[chosen_number]
         else:
-            weekly_menu[day] = []
+            menu[day] = []
 
-    return weekly_menu
+    return menu
+
 
 @app.get("/ping")
 async def ping():
