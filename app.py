@@ -92,7 +92,7 @@ async def generate_weekly_menu():
     menu = {}
 
     for day, category in categories.items():
-        filtered = [row for row in data if row.get("категорія") == category]
+        filtered = [row for row in data if clean_category(row.get("категорія", "")) == clean_category(category)]
 
         grouped = defaultdict(list)
         for row in filtered:
