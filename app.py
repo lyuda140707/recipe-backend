@@ -57,8 +57,25 @@ async def get_recipes(request: Request):
     all_recipes = load_all_recipes()
     category = request.query_params.get("category")
 
+    import re
+
+def clean_category(raw: str):
+    # видаляє всі емодзі та приводить до нижнього регістру
+    return re.sub(r'[^\w\s]', '', raw).strip().lower()
+
+@app.get("/recipes")
+async def get_recipes(request: Request):
+    all_recipes = load_all_recipes()
+    category = request.query_params.get("category")
+
     if category:
-       return [r for r in all_recipes if r.get("категорія", "").strip().lower() == category.strip().lower()]
+        clean_input = clean_category(category)
+        return [
+            r for r in all_recipes
+            if clean_category(r.get("категорія", "")) == clean_input
+        ]
+
+    return all_recipes
 
     return all_recipes
     
