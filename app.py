@@ -120,4 +120,41 @@ async def ping():
     return {"pong": True}
 
 
+from pydantic import BaseModel
+import os
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
+
+class PaymentNotification(BaseModel):
+    name: str
+    user_id: int
+    username: str
+
+@app.post("/notify-payment")
+async def notify_payment(data: PaymentNotification):
+    message = (
+        f"💳 Хтось натиснув 'Я оплатив'\n\n"
+        f"👤 Username: @{data.username}\n"
+        f"🆔 ID: <code>{data.user_id}</code>\n"
+        f"📛 Імʼя/номер картки: <b>{data.name}</b>"
+    )
+
+    async with httpx.AsyncClient() as client:
+        await client.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={
+                "chat_id": ADMIN_CHAT_ID,
+                "text": message,
+                "parse_mode": "HTML"
+            }
+        )
+
+    return {"status": "ok"}
+
+
 
