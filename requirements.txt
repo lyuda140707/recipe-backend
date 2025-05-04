@@ -5,3 +5,4 @@ oauth2client
 aiogram==2.25.1
 httpx
 python-dotenv
+aiohttp
