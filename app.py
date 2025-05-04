@@ -8,6 +8,9 @@ import json
 from telegram_bot import bot, dp
 from aiogram.types import Update
 import asyncio
+from fastapi import FastAPI
+from wayforpay import generate_wayforpay_payment
+
 
 
 
@@ -28,6 +31,11 @@ worksheet = spreadsheet.sheet1
 # Створення FastAPI
 app = FastAPI()
 
+@app.get("/create-payment")
+def create_payment(user_id: int):
+    payment_data = generate_wayforpay_payment(user_id)
+    return payment_data
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
