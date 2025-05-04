@@ -1,41 +1,29 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uvicorn
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
+import gspread
+import httpx
+import random
+import re
+from collections import defaultdict
+from dotenv import load_dotenv
+from oauth2client.service_account import ServiceAccountCredentials
 from telegram_bot import bot, dp
 from aiogram.types import Update
-import asyncio
-from fastapi import FastAPI
 from wayforpay import generate_wayforpay_payment
 
+load_dotenv()
 
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
 
-
-# Читання credentials із Secret File
-with open('/etc/secrets/credentials.json', 'r') as f:
-    credentials_info = json.load(f)
-
-credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive"
-])
-
-# Підключення до Google Sheets
-client = gspread.authorize(credentials)
-spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr_uNCL0_F7Qcrgwg_K0YCSEy9ISoWX_ZUDuSYg/edit')
-worksheet = spreadsheet.sheet1
-
-# Створення FastAPI
+# Ініціалізація FastAPI
 app = FastAPI()
 
-@app.get("/create-payment")
-def create_payment(user_id: int):
-    payment_data = generate_wayforpay_payment(user_id)
-    return payment_data
-    
+# Дозволити всі CORS-запити
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -43,6 +31,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Авторизація з Google Sheets
+with open('/etc/secrets/credentials.json', 'r') as f:
+    credentials_info = json.load(f)
+
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+])
+client = gspread.authorize(credentials)
+spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr_uNCL0_F7Qcrgwg_K0YCSEy9ISoWX_ZUDuSYg/edit')
+worksheet = spreadsheet.sheet1
+
+# Webhook Telegram
 @app.on_event("startup")
 async def on_startup():
     await bot.set_webhook("https://recipe-backend-0gz1.onrender.com/webhook")
@@ -55,15 +57,23 @@ async def webhook_handler(request: Request):
     print("✅ Я оновлений!")
     await dp.process_update(telegram_update)
     return {"ok": True}
-    
-# Завантажити всі рецепти
+
+# Ендпоінт створення платежу
+@app.get("/create-payment")
+def create_payment(user_id: int):
+    payment_data = generate_wayforpay_payment(user_id)
+    return payment_data
+
+# Пінг
+@app.get("/ping")
+async def ping():
+    return {"pong": True}
+
+# Завантаження всіх рецептів
 def load_all_recipes():
     return worksheet.get_all_records()
 
-import re  # або перенеси нагору
-
 def clean_category(raw: str):
-    # видаляє всі емодзі та приводить до нижнього регістру
     return re.sub(r'[^\w\s]', '', raw).strip().lower()
 
 @app.get("/recipes")
@@ -77,12 +87,7 @@ async def get_recipes(request: Request):
             r for r in all_recipes
             if clean_category(r.get("категорія", "")) == clean_input
         ]
-
     return all_recipes
-
-    
-from collections import defaultdict
-import random
 
 @app.get("/weekly-menu")
 async def generate_weekly_menu():
@@ -101,7 +106,6 @@ async def generate_weekly_menu():
 
     for day, category in categories.items():
         filtered = [row for row in data if clean_category(row.get("категорія", "")) == clean_category(category)]
-
         grouped = defaultdict(list)
         for row in filtered:
             grouped[row["номер рецепту"]].append(row)
@@ -114,22 +118,7 @@ async def generate_weekly_menu():
 
     return menu
 
-
-@app.get("/ping")
-async def ping():
-    return {"pong": True}
-
-
-from pydantic import BaseModel
-import os
-import httpx
-from dotenv import load_dotenv
-
-load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
-
+# Повідомлення про оплату (кнопка "Я оплатив")
 class PaymentNotification(BaseModel):
     name: str
     user_id: int
@@ -155,6 +144,3 @@ async def notify_payment(data: PaymentNotification):
         )
 
     return {"status": "ok"}
-
-
-
