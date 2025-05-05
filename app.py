@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+import requests
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -15,10 +16,12 @@ from telegram_bot import bot, dp
 from aiogram.types import Update
 from wayforpay import generate_wayforpay_payment
 
-load_dotenv()
 
+load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
+
+    
 
 # Ініціалізація FastAPI
 app = FastAPI()
@@ -49,6 +52,7 @@ worksheet = spreadsheet.sheet1
 async def on_startup():
     await bot.set_webhook("https://recipe-backend-0gz1.onrender.com/webhook")
     print("✅ Webhook встановлено")
+
 
 @app.post("/webhook")
 async def webhook_handler(request: Request):
@@ -126,15 +130,15 @@ class PaymentNotification(BaseModel):
 
 @app.post("/notify-payment")
 async def notify_payment(data: PaymentNotification):
-    print("✅ Запит прийнято:", data.dict())  # 👉 ДОДАЙ ЦЕ РЯДКОМ ПЕРЕД message
+    print("✅ Запит прийнято:", data.dict())
 
     message = (
-        f"💳 Хтось натиснув 'Я оплатив'\n\n"
-        f"👤 Username: @{data.username}\n"
+        f"🧾 Запит на PRO доступ\n"
+        f"👤 Імʼя/картка: <b>{data.name}</b>\n"
         f"🆔 ID: <code>{data.user_id}</code>\n"
-        f"📛 Імʼя/номер картки: <b>{data.name}</b>"
+        f"📛 Username: @{data.username or 'немає'}\n\n"
+        f"👉 /ok {data.user_id}"
     )
-
 
     async with httpx.AsyncClient() as client:
         await client.post(
@@ -147,3 +151,4 @@ async def notify_payment(data: PaymentNotification):
         )
 
     return {"status": "ok"}
+
