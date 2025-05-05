@@ -45,7 +45,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info,
 ])
 client = gspread.authorize(credentials)
 spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr_uNCL0_F7Qcrgwg_K0YCSEy9ISoWX_ZUDuSYg/edit')
-worksheet = spreadsheet.sheet1
+pro_worksheet = spreadsheet.worksheet("pro_users")
 
 # Webhook Telegram
 @app.on_event("startup")
