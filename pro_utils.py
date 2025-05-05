@@ -26,7 +26,7 @@ def find_first_empty_row(worksheet):
 
 def add_pro_user(user_id: int, username: str, name: str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    row = [str(user_id), username or "", name, now]
+    row = [str(user_id), username if username else "-", name, now]
     row_index = find_first_empty_row(pro_worksheet)
     pro_worksheet.update(f"A{row_index}:D{row_index}", [row])
 
