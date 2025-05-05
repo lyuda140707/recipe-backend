@@ -166,10 +166,8 @@ async def notify_payment(data: PaymentNotification):
     return {"status": "ok"}
 from pro_utils import is_pro_user  # Додай імпорт
 
-@app.get("/is-pro")
-async def check_pro(user_id: int):
-    result = is_pro_user(user_id)
-    return {"is_pro": result}
+    
+
 
 
 
