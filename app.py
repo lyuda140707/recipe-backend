@@ -46,6 +46,12 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info,
 client = gspread.authorize(credentials)
 spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr_uNCL0_F7Qcrgwg_K0YCSEy9ISoWX_ZUDuSYg/edit')
 pro_worksheet = spreadsheet.worksheet("pro_users")
+from datetime import datetime
+
+def add_pro_user(user_id: int, username: str, name: str):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pro_worksheet.append_row([str(user_id), username, name, now])
+
 
 # Webhook Telegram
 @app.on_event("startup")
