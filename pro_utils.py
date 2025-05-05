@@ -1,7 +1,7 @@
 import gspread
 import json
 import os
-from datetime import datetime
+
 from oauth2client.service_account import ServiceAccountCredentials
 
 # Завантаження credentials
@@ -24,26 +24,36 @@ def find_first_empty_row(worksheet):
     return len(rows) + 1  # якщо всі рядки зайняті, вставляємо після останнього
 
 
+from datetime import datetime, timedelta  # ← додай поруч із import datetime
+
 def add_pro_user(user_id: int, username: str, name: str):
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    row = [str(user_id), username if username else "-", name, now]
+    now = datetime.now()
+    expires = now + timedelta(days=30)  # додаємо 30 днів
+    row = [
+        str(user_id),
+        username or "",      # захист від None
+        name,
+        now.strftime("%Y-%m-%d %H:%M:%S"),
+        expires.strftime("%Y-%m-%d")     # додаємо дату завершення
+    ]
     row_index = find_first_empty_row(pro_worksheet)
-    pro_worksheet.update(f"A{row_index}:D{row_index}", [row])
+    pro_worksheet.update(f"A{row_index}:E{row_index}", [row])  # E замість D
 
 
 
-def is_pro_user(user_id: int) -> bool:
+
+def is_pro_user(user_id: int) -> dict:
     try:
         all_rows = pro_worksheet.get_all_records()
-        print("📋 Всі рядки:", all_rows)  # ← Додано
         for row in all_rows:
             row_id = str(row.get("ID Користувача", "")).strip()
-            print(f"🔍 Перевіряю: {row_id} == {user_id}")  # ← Додано
             if row_id == str(user_id).strip():
-                return True
-        return False
+                expires = row.get("Дата завершення", "").strip()
+                return {"is_pro": True, "expires": expires}
+        return {"is_pro": False}
     except Exception as e:
         print(f"❌ Помилка перевірки PRO: {e}")
-        return False
+        return {"is_pro": False}
+
 
 
