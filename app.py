@@ -26,6 +26,16 @@ ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 # Ініціалізація FastAPI
 app = FastAPI()
 
+# Додаємо CORS — обовʼязково для WebApp
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # можеш вказати точний домен
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 # Дозволити всі CORS-запити
 app.add_middleware(
     CORSMiddleware,
@@ -160,4 +170,14 @@ from pro_utils import is_pro_user  # Додай імпорт
 async def check_pro(user_id: int):
     result = is_pro_user(user_id)
     return {"is_pro": result}
+
+
+
+@app.get("/is-pro")
+async def check_pro(request: Request):
+    user_id = request.query_params.get("user_id")
+    if not user_id:
+        return {"is_pro": False}
+    return is_pro_user(user_id)
+
 
