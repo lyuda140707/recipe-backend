@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.utils import executor
 from aiogram.dispatcher.filters import Command  # тільки один раз
 import os
-from app import add_pro_user
+from pro_utils import add_pro_user
 
 
 API_TOKEN = os.getenv("BOT_TOKEN")
