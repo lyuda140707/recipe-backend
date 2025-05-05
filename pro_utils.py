@@ -24,7 +24,8 @@ def add_pro_user(user_id: int, username: str, name: str):
 def is_pro_user(user_id: int) -> bool:
     try:
         all_rows = pro_worksheet.get_all_records()
-        return any(str(row["ID Користувача"]) == str(user_id) for row in all_rows)
+        return any(str(row.get("ID Користувача", "")).strip() == str(user_id) for row in all_rows)
+
     except Exception as e:
         print(f"❌ Помилка перевірки PRO: {e}")
         return False
