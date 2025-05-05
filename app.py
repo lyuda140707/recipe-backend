@@ -126,12 +126,15 @@ class PaymentNotification(BaseModel):
 
 @app.post("/notify-payment")
 async def notify_payment(data: PaymentNotification):
+    print("✅ Запит прийнято:", data.dict())  # 👉 ДОДАЙ ЦЕ РЯДКОМ ПЕРЕД message
+
     message = (
         f"💳 Хтось натиснув 'Я оплатив'\n\n"
         f"👤 Username: @{data.username}\n"
         f"🆔 ID: <code>{data.user_id}</code>\n"
         f"📛 Імʼя/номер картки: <b>{data.name}</b>"
     )
+
 
     async with httpx.AsyncClient() as client:
         await client.post(
