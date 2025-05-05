@@ -24,14 +24,15 @@ def add_pro_user(user_id: int, username: str, name: str):
 def is_pro_user(user_id: int) -> bool:
     try:
         all_rows = pro_worksheet.get_all_records()
+        print("📋 Всі рядки:", all_rows)  # ← Додано
         for row in all_rows:
             row_id = str(row.get("ID Користувача", "")).strip()
+            print(f"🔍 Перевіряю: {row_id} == {user_id}")  # ← Додано
             if row_id == str(user_id).strip():
-                print(f"🔍 Знайдено ID: {row_id}")
                 return True
-        print(f"⚠️ Не знайдено ID: {user_id}")
         return False
     except Exception as e:
         print(f"❌ Помилка перевірки PRO: {e}")
         return False
+
 
