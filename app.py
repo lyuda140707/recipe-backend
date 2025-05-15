@@ -170,9 +170,6 @@ from pro_utils import is_pro_user  # Додай імпорт
 
     
 
-
-
-
 @app.get("/is-pro")
 async def check_pro(request: Request):
     user_id = request.query_params.get("user_id")
@@ -180,22 +177,3 @@ async def check_pro(request: Request):
         return {"is_pro": False}
     return is_pro_user(user_id)
 
-async def check_subscription(user_id: int) -> bool:
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
-    params = {
-        "chat_id": CHANNEL_USERNAME,
-        "user_id": user_id
-    }
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params)
-        if resp.status_code != 200:
-            return False
-        data = resp.json()
-        status = data.get("result", {}).get("status", "")
-        # Статуси, які означають, що користувач підписаний або адміністратор
-        return status in ["member", "creator", "administrator"]
-
-@app.get("/check-subscription")
-async def check_subscription_endpoint(user_id: int):
-    is_subscribed = await check_subscription(user_id)
-    return JSONResponse(content={"is_subscribed": is_subscribed})
