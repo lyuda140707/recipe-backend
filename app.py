@@ -179,3 +179,25 @@ async def check_pro(request: Request):
         return {"is_pro": False}
     return is_pro_user(user_id)
 
+@app.get("/check-subscription")
+async def check_subscription(user_id: int):
+    if not user_id:
+        return {"is_subscribed": False}
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
+    params = {
+        "chat_id": CHANNEL_USERNAME,
+        "user_id": user_id
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        data = response.json()
+
+    print(f"🔍 Результат перевірки підписки: {data}")
+
+    if data.get("ok") and data.get("result", {}).get("status") in ["member", "administrator", "creator"]:
+        return {"is_subscribed": True}
+    else:
+        return {"is_subscribed": False}
+
