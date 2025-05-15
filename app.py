@@ -15,12 +15,14 @@ from oauth2client.service_account import ServiceAccountCredentials
 from telegram_bot import bot, dp
 from aiogram.types import Update
 from wayforpay import generate_wayforpay_payment
+import asyncio
+from fastapi.responses import JSONResponse
 
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
-
+CHANNEL_USERNAME = "@receptukTop" 
     
 
 # Ініціалізація FastAPI
@@ -178,4 +180,22 @@ async def check_pro(request: Request):
         return {"is_pro": False}
     return is_pro_user(user_id)
 
+async def check_subscription(user_id: int) -> bool:
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
+    params = {
+        "chat_id": CHANNEL_USERNAME,
+        "user_id": user_id
+    }
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url, params=params)
+        if resp.status_code != 200:
+            return False
+        data = resp.json()
+        status = data.get("result", {}).get("status", "")
+        # Статуси, які означають, що користувач підписаний або адміністратор
+        return status in ["member", "creator", "administrator"]
 
+@app.get("/check-subscription")
+async def check_subscription_endpoint(user_id: int):
+    is_subscribed = await check_subscription(user_id)
+    return JSONResponse(content={"is_subscribed": is_subscribed})
