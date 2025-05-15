@@ -20,6 +20,7 @@ from wayforpay import generate_wayforpay_payment
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
+CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME")
 
     
 
