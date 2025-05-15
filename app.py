@@ -15,15 +15,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 from telegram_bot import bot, dp
 from aiogram.types import Update
 from wayforpay import generate_wayforpay_payment
-import asyncio
-from fastapi.responses import JSONResponse
-from fastapi.responses import HTMLResponse
 
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
-CHANNEL_USERNAME = "@receptukTop" 
+
     
 
 # Ініціалізація FastAPI
@@ -39,6 +36,15 @@ app.add_middleware(
 )
 
 
+# Дозволити всі CORS-запити
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Авторизація з Google Sheets
 with open('/etc/secrets/credentials.json', 'r') as f:
     credentials_info = json.load(f)
@@ -52,9 +58,6 @@ spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1zJOrLr
 worksheet = spreadsheet.sheet1
 
 
-@app.get("/", response_class=HTMLResponse)
-async def home():
-    return "<h2>RecipeBot API працює! 🎉</h2>"
 
 
 # Webhook Telegram
@@ -164,6 +167,9 @@ async def notify_payment(data: PaymentNotification):
 from pro_utils import is_pro_user  # Додай імпорт
 
     
+
+
+
 
 @app.get("/is-pro")
 async def check_pro(request: Request):
