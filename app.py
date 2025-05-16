@@ -201,3 +201,25 @@ async def check_subscription(user_id: int):
     else:
         return {"is_subscribed": False}
 
+@app.get("/send-webapp-button")
+async def send_webapp_button():
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": CHANNEL_USERNAME,
+        "text": "🎉 Дякуємо за підписку! Тисни нижче, щоб повернутись у застосунок 👇",
+        "reply_markup": {
+            "inline_keyboard": [[
+                {
+                    "text": "🍳 Відкрити WebApp",
+                    "web_app": {
+                        "url": os.getenv("WEBAPP_URL")
+                    }
+                }
+            ]]
+        }
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json=payload)
+        print("✅ Відправлено в канал:", response.json())
+        return response.json()
