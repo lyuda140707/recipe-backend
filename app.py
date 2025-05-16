@@ -210,10 +210,8 @@ async def send_webapp_button():
         "reply_markup": {
             "inline_keyboard": [[
                 {
-                    "text": "🍳 Відкрити WebApp",
-                    "web_app": {
-                        "url": os.getenv("WEBAPP_URL")
-                    }
+                    "text": "🍽 Відкрити застосунок",
+                    "url": "https://t.me/recept_kitchen_bot?startapp"
                 }
             ]]
         }
