@@ -211,7 +211,8 @@ async def send_webapp_button():
             "inline_keyboard": [[
                 {
                     "text": "🍽 Відкрити застосунок",
-                    "url": "https://t.me/recept_kitchen_bot?startapp"
+                    "url": "https://lyuda140707.github.io/telegram-recipe-webapp/"
+
                 }
             ]]
         }
