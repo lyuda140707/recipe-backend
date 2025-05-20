@@ -47,8 +47,9 @@ async def approve_pro(message: types.Message):
 
 from aiogram import types
 
-@dp.message_handler(content_types=types.ContentType.VIDEO)
-async def handle_video(message: types.Message):
-    file_id = message.video.file_id
-    await message.reply(f"🎥 file_id:\n`{file_id}`", parse_mode="Markdown")
+@dp.channel_post_handler(content_types=types.ContentType.VIDEO)
+async def handle_channel_video(post: types.Message):
+    file_id = post.video.file_id
+    await bot.send_message(ADMIN_CHAT_ID, f"🎥 Відео з каналу. file_id:\n`{file_id}`", parse_mode="Markdown")
+
 
