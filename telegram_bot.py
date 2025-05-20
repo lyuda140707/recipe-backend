@@ -50,35 +50,19 @@ async def approve_pro(message: types.Message):
         await message.reply(f"❌ Помилка: {e}")
 
 
-@dp.channel_post_handler()
+@dp.channel_post_handler(content_types=types.ContentType.VIDEO)
 async def handle_any_channel_post(post: types.Message):
-    print("✅ СПРАЦЮВАВ channel_post_handler") 
-    admin_id = ADMIN_CHAT_ID
-
-
-    if post.video:
-        file_id = post.video.file_id
-        print(f"🎯 Знайдено відео, file_id: {file_id}")
-        print("📤 Надсилаю file_id адміну:", admin_id)
-
-        try:
-            await bot.send_message(
-                admin_id,
-                f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
-                parse_mode="HTML"
-            )
-            print("✅ file_id надіслано успішно")
-        except Exception as e:
-            print("❌ ПОМИЛКА надсилання file_id:", repr(e))  # ← тут ключ!
+    print("✅ СПРАЦЮВАВ channel_post_handler")
 
     try:
-        caption = post.caption or "(без тексту)"
-        print(f"📝 Підпис: {caption}")
-
+        file_id = post.video.file_id
+        print(f"🎯 Знайдено відео, file_id: {file_id}")
+        
         await bot.send_message(
-            admin_id,
-            f"📣 Підпис до відео:\n{caption}"
+            ADMIN_CHAT_ID,
+            f"🎥 Відео з каналу:\n<code>{file_id}</code>",
+            parse_mode="HTML"
         )
-        print("✅ Підпис до відео надіслано успішно")
+        print("✅ file_id надіслано успішно")
     except Exception as e:
-        print("❌ Помилка надсилання підпису:", repr(e))  # ← і тут
+        print("❌ ПОМИЛКА:", repr(e))
