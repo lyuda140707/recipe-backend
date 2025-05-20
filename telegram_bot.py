@@ -57,6 +57,8 @@ async def handle_any_channel_post(post: types.Message):
     if post.video:
         file_id = post.video.file_id
         print(f"🎯 Знайдено відео, file_id: {file_id}")
+        print("📤 Надсилаю file_id адміну:", admin_id)
+
 
         try:
             await bot.send_message(
