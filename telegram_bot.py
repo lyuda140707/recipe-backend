@@ -52,16 +52,16 @@ async def handle_any_channel_post(post: types.Message):
     if post.video:
         file_id = post.video.file_id
         await bot.send_message(
-            os.getenv("ADMIN_CHAT_ID"),
-            f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
-            parse_mode="HTML"
-        )
+    int(os.getenv("ADMIN_CHAT_ID")),
+    f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
+    parse_mode="HTML"
+)
 
     await bot.send_message(
-        os.getenv("ADMIN_CHAT_ID"),
-        f"📣 Повне повідомлення:\n<code>{post}</code>",
-        parse_mode="HTML"
-    )
+    int(os.getenv("ADMIN_CHAT_ID")),
+    f"📣 Повне повідомлення:\n<code>{post}</code>",
+    parse_mode="HTML"
+)
 
 
 
