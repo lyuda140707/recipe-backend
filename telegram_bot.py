@@ -67,7 +67,7 @@ async def handle_any_channel_post(post: types.Message):
             )
             print("✅ file_id надіслано успішно")
         except Exception as e:
-            print("❌ ПОМИЛКА надсилання file_id:", repr(e))
+            print("❌ ПОМИЛКА надсилання file_id:", repr(e))  # ← тут ключ!
 
     try:
         caption = post.caption or "(без тексту)"
@@ -79,4 +79,4 @@ async def handle_any_channel_post(post: types.Message):
         )
         print("✅ Підпис до відео надіслано успішно")
     except Exception as e:
-        print("❌ Помилка надсилання підпису:", repr(e))
+        print("❌ Помилка надсилання підпису:", repr(e))  # ← і тут
