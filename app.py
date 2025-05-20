@@ -63,10 +63,14 @@ async def on_startup():
 @app.post("/webhook")
 async def webhook_handler(request: Request):
     data = await request.json()
+
+    # 🟡 Ось ця стрічка — лог для Render
+    print("📥 Оновлення з Telegram:", json.dumps(data, indent=2, ensure_ascii=False))
+
     telegram_update = Update(**data)
-    print("✅ Я оновлений!")
     await dp.process_update(telegram_update)
     return {"ok": True}
+
 
 # Ендпоінт створення платежу
 @app.get("/create-payment")
