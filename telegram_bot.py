@@ -52,8 +52,9 @@ async def approve_pro(message: types.Message):
 
 @dp.channel_post_handler()
 async def handle_any_channel_post(post: types.Message):
-       print("✅ СПРАЦЮВАВ channel_post_handler") 
+    print("✅ СПРАЦЮВАВ channel_post_handler") 
     admin_id = ADMIN_CHAT_ID
+
 
     if post.video:
         file_id = post.video.file_id
