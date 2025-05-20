@@ -1,29 +1,29 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.utils import executor
-from aiogram.dispatcher.filters import Command  # тільки один раз
+from aiogram.dispatcher.filters import Command
 import os
 from pro_utils import add_pro_user
-from aiogram import types
-
 
 API_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
+print("🧾 ADMIN_CHAT_ID =", ADMIN_CHAT_ID)
+
 bot = Bot(token=API_TOKEN)
-Bot.set_current(bot)  # ВАЖЛИВО!
+Bot.set_current(bot)
 dp = Dispatcher(bot)
 
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📱 Відкрити меню", web_app=WebAppInfo(url="https://lyuda140707.github.io/telegram-recipe-webapp/"))]
+        [InlineKeyboardButton(
+            text="📱 Відкрити меню",
+            web_app=WebAppInfo(url="https://lyuda140707.github.io/telegram-recipe-webapp/")
+        )]
     ])
     await message.answer("Привіт! 👋 Щоб почати — натисни кнопку нижче 👇", reply_markup=keyboard)
-
-
-
 
 
 @dp.message_handler(Command("ok"))
@@ -49,15 +49,14 @@ async def approve_pro(message: types.Message):
     except Exception as e:
         await message.reply(f"❌ Помилка: {e}")
 
-from aiogram import types
 
 @dp.channel_post_handler()
 async def handle_any_channel_post(post: types.Message):
-    admin_id = int(os.getenv("ADMIN_CHAT_ID"))
+    admin_id = ADMIN_CHAT_ID
 
     if post.video:
         file_id = post.video.file_id
-        print(f"🎯 Знайдено відео, file_id: {file_id}")  # ➕ ДОДАЙ ЦЕ
+        print(f"🎯 Знайдено відео, file_id: {file_id}")
 
         try:
             await bot.send_message(
@@ -65,12 +64,13 @@ async def handle_any_channel_post(post: types.Message):
                 f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
                 parse_mode="HTML"
             )
+            print("✅ file_id надіслано успішно")
         except Exception as e:
-            print("❌ Помилка надсилання відео file_id:", e)
+            print("❌ ПОМИЛКА надсилання file_id:", repr(e))
 
     try:
         post_summary = f"Повідомлення:\n{post.caption or '(без тексту)'}"
-        print(f"📝 {post_summary}")  # ➕ ДОДАЙ ЦЕ
+        print(f"📝 {post_summary}")
 
         await bot.send_message(
             admin_id,
@@ -78,9 +78,4 @@ async def handle_any_channel_post(post: types.Message):
             parse_mode="HTML"
         )
     except Exception as e:
-        print("❌ Помилка надсилання повного поста:", e)
-
-
-
-
-
+        print("❌ Помилка надсилання повного поста:", repr(e))
