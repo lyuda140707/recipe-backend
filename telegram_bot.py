@@ -4,6 +4,7 @@ from aiogram.utils import executor
 from aiogram.dispatcher.filters import Command  # тільки один раз
 import os
 from pro_utils import add_pro_user
+from aiogram import types
 
 
 API_TOKEN = os.getenv("BOT_TOKEN")
@@ -43,3 +44,11 @@ async def approve_pro(message: types.Message):
 
     except Exception as e:
         await message.reply(f"❌ Помилка: {e}")
+
+from aiogram import types
+
+@dp.message_handler(content_types=types.ContentType.VIDEO)
+async def handle_video(message: types.Message):
+    file_id = message.video.file_id
+    await message.reply(f"🎥 file_id:\n`{file_id}`", parse_mode="Markdown")
+
