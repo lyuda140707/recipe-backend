@@ -59,7 +59,6 @@ async def handle_any_channel_post(post: types.Message):
         print(f"🎯 Знайдено відео, file_id: {file_id}")
         print("📤 Надсилаю file_id адміну:", admin_id)
 
-
         try:
             await bot.send_message(
                 admin_id,
@@ -71,13 +70,13 @@ async def handle_any_channel_post(post: types.Message):
             print("❌ ПОМИЛКА надсилання file_id:", repr(e))
 
     try:
-        post_summary = f"Повідомлення:\n{post.caption or '(без тексту)'}"
-        print(f"📝 {post_summary}")
+        caption = post.caption or "(без тексту)"
+        print(f"📝 Підпис: {caption}")
 
         await bot.send_message(
             admin_id,
-            f"📣 Повне повідомлення:\n<code>{post}</code>",
-            parse_mode="HTML"
+            f"📣 Підпис до відео:\n{caption}"
         )
+        print("✅ Підпис до відео надіслано успішно")
     except Exception as e:
-        print("❌ Помилка надсилання повного поста:", repr(e))
+        print("❌ Помилка надсилання підпису:", repr(e))
