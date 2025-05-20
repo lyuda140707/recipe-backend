@@ -252,3 +252,17 @@ async def send_webapp_button():
         response = await client.post(url, json=payload)
         print("✅ Відправлено в канал:", response.json())
         return response.json()
+
+@app.get("/get-file-url")
+async def get_file_url(file_id: str):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        data = response.json()
+        if "result" not in data:
+            return {"error": "Файл не знайдено"}
+        file_path = data["result"]["file_path"]
+        return {
+            "url": f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+        }
+
