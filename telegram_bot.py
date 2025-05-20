@@ -49,19 +49,28 @@ from aiogram import types
 
 @dp.channel_post_handler()
 async def handle_any_channel_post(post: types.Message):
+    admin_id = int(os.getenv("ADMIN_CHAT_ID"))
+
     if post.video:
         file_id = post.video.file_id
-        await bot.send_message(
-    int(os.getenv("ADMIN_CHAT_ID")),
-    f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
-    parse_mode="HTML"
-)
+        try:
+            await bot.send_message(
+                admin_id,
+                f"🎥 Відео з каналу. file_id:\n<code>{file_id}</code>",
+                parse_mode="HTML"
+            )
+        except Exception as e:
+            print("❌ Помилка надсилання відео file_id:", e)
 
-    await bot.send_message(
-    int(os.getenv("ADMIN_CHAT_ID")),
-    f"📣 Повне повідомлення:\n<code>{post}</code>",
-    parse_mode="HTML"
-)
+    try:
+        await bot.send_message(
+            admin_id,
+            f"📣 Повне повідомлення:\n<code>{post}</code>",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        print("❌ Помилка надсилання повного поста:", e)
+
 
 
 
