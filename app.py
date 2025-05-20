@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import uvicorn
 import os
 import json
 import gspread
@@ -15,6 +14,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from telegram_bot import bot, dp
 from aiogram.types import Update
 from wayforpay import generate_wayforpay_payment
+from fastapi import Query  # на початку файлу, якщо ще не було
 
 
 load_dotenv()
@@ -37,14 +37,6 @@ app.add_middleware(
 )
 
 
-# Дозволити всі CORS-запити
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Авторизація з Google Sheets
 with open('/etc/secrets/credentials.json', 'r') as f:
@@ -94,6 +86,16 @@ def load_all_recipes():
 def clean_category(raw: str):
     return re.sub(r'[^\w\s]', '', raw).strip().lower()
 
+def normalize_word(word):
+    word = word.lower().strip(".,!?ʼ’()[]{}")
+    replacements = {
+        "і": "и", "ї": "и", "є": "е", "ґ": "г"
+    }
+    for k, v in replacements.items():
+        word = word.replace(k, v)
+    return word
+
+
 @app.get("/recipes")
 async def get_recipes(request: Request):
     all_recipes = load_all_recipes()
@@ -106,6 +108,34 @@ async def get_recipes(request: Request):
             if clean_category(r.get("категорія", "")) == clean_input
         ]
     return all_recipes
+
+
+
+@app.get("/search")
+async def search_recipes(query: str = Query(...)):
+    raw_data = load_all_recipes()
+
+    # 🔁 Групуємо за номером рецепту
+    grouped = {}
+    for r in raw_data:
+        num = r.get("номер рецепту")
+        if num:
+            grouped.setdefault(num, []).append(r)
+
+    words = [normalize_word(w) for w in query.lower().split() if len(w) > 2]
+    results = []
+
+    for group in grouped.values():
+        r = next((x for x in group if x.get("тип блоку") == "текст"), group[0])
+        full = f"{r.get('назва рецепту', '')} {r.get('інгредієнти', '')} {r.get('контент', '')}".lower()
+        norm_set = set(normalize_word(w) for w in full.split())
+
+        matches = sum(w in norm_set for w in words)
+        if matches:
+            results.append(group)
+
+    return results[:20]  # обмежити до 20 результатів
+
 
 @app.get("/weekly-menu")
 async def generate_weekly_menu():
