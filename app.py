@@ -15,6 +15,7 @@ from telegram_bot import bot, dp
 from aiogram.types import Update
 from wayforpay import generate_wayforpay_payment
 from fastapi import Query  # на початку файлу, якщо ще не було
+from datetime import datetime, timedelta
 
 
 load_dotenv()
@@ -71,6 +72,12 @@ async def webhook_handler(request: Request):
     await dp.process_update(telegram_update)
     return {"ok": True}
 
+# 🟢 Глобальна змінна для кешу
+recipe_cache = {
+    "data": [],
+    "timestamp": datetime.min
+}
+
 
 # Ендпоінт створення платежу
 @app.get("/create-payment")
@@ -85,7 +92,17 @@ async def ping():
 
 # Завантаження всіх рецептів
 def load_all_recipes():
-    return worksheet.get_all_records()
+    now = datetime.utcnow()
+    if (now - recipe_cache["timestamp"]) < timedelta(minutes=3):
+        return recipe_cache["data"]  # 🔁 повертаємо з кешу, якщо не старше 3 хв
+
+    # 🧠 якщо кеш застарілий — оновлюємо
+    print("🔄 Оновлення кешу з Google Таблиці...")
+    data = worksheet.get_all_records()
+    recipe_cache["data"] = data
+    recipe_cache["timestamp"] = now
+    return data
+
 
 def clean_category(raw: str):
     return re.sub(r'[^\w\s]', '', raw).strip().lower()
@@ -113,6 +130,25 @@ async def get_recipes(request: Request):
         ]
     return all_recipes
 
+@app.get("/recipes/short")
+async def get_short_recipes(request: Request):
+    all_recipes = load_all_recipes()
+    category = request.query_params.get("category")
+
+    filtered = []
+    for row in all_recipes:
+        if category:
+            if clean_category(row.get("категорія", "")) != clean_category(category):
+                continue
+        filtered.append({
+            "номер рецепту": row.get("номер рецепту"),
+            "назва рецепту": row.get("назва рецепту"),
+            "категорія": row.get("категорія"),
+            "інгредієнти": row.get("інгредієнти"),
+            "час приготування": row.get("час приготування"),
+        })
+
+    return filtered
 
 
 @app.get("/search")
@@ -269,4 +305,11 @@ async def get_file_url(file_id: str):
         return {
             "url": f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
         }
+
+@app.get("/recipe/{recipe_id}")
+async def get_full_recipe(recipe_id: str):
+    all_data = load_all_recipes()
+    result = [row for row in all_data if row.get("номер рецепту") == recipe_id]
+    return result
+
 
