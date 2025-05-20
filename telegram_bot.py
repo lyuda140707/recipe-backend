@@ -16,10 +16,9 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: types.Message):
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📱 Відкрити меню", web_app=WebAppInfo(url="https://lyuda140707.github.io/telegram-recipe-webapp/"))]
-    ])
-    await message.answer("Привіт! 👋 Щоб почати — натисни кнопку нижче 👇", reply_markup=keyboard)
+    print("🔐 Твій Telegram ID:", message.chat.id)
+    await message.answer(f"Ваш Telegram ID: <code>{message.chat.id}</code>", parse_mode="HTML")
+
 
 
 @dp.message_handler(Command("ok"))
