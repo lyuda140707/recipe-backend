@@ -20,7 +20,8 @@ async def send_welcome(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text="📱 Відкрити меню",
-            web_app=WebAppInfo(url="https://lyuda140707.github.io/telegram-recipe-webapp/")
+            web_app=WebAppInfo(url="https://lyuda140707.github.io/telegram-recipe-webapp/?v=3")
+
         )]
     ])
     await message.answer("Привіт! 👋 Щоб почати — натисни кнопку нижче 👇", reply_markup=keyboard)
